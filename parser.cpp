@@ -1,13 +1,23 @@
 #include <iostream>
 #include <string>
+#include <queue>
 #include "parser.h"
 #include "constants.h"
 using namespace std;
 
 
-// IsNumber checks whether symbol is a number or not.
-/// TODO:20 check whether 48-57 is the right ascii range.
 
+queue<string>* CreateQueue(){
+    queue<string>* numbers_queue;
+    return numbers_queue;
+}
+
+Tree* Create_Tree(){
+    Tree* tree = new Tree();
+    return tree;
+}
+
+// IsNumber checks whether symbol is a number or not.
 bool IsNumber(char symbol){
     if(symbol >= 48 && symbol <= 57){
         return true;
@@ -42,7 +52,7 @@ string GetNumber(string expression, int count, int length){
 }
 
 
-IsOperator(char symbol){
+bool IsOperator(char symbol){
     if(symbol == PLUS ||
        symbol == MINUS ||
        symbol == MULTIPLY ||
@@ -56,35 +66,124 @@ IsOperator(char symbol){
 // HandleUnary will start at position count in expression and
 // return a simplified number. The max position will be length
 // For example: --+5 -> -5
-string HandleUnary(string expression, int count, int length){
+string HandleUnary(string expression, int* count, int length){
     int append_negative = 0;
     string number;
     try
     {
-        for (int i = count; i < length; ++i){
+        for (int i = *count; i < length; ++i){
             if(expression[i] == MINUS){
                 append_negative++;
             }
             else if(IsNumber(expression[i])){
                 number = GetNumber(expression, i, length);
+                *count = i;
                 break;
             }
-            else if (expression[i] != PLUS){
-                // TODO:40 throw exception
+            else if (expression[i] != PLUS || (expression[i] != DECIMAL && IsNumber(expression[i+1]))){
+            // if we don't detect a + and a .NUMBER then there is an error in input
+                throw "expression was not written correctly,
+                       error was caught in position:" + i +
+                      "\n" + expression[i-1] + expression[i]
+                      + expression[i+1];
             }
-
         }
 
-        // TODO: confirm that a bool value > 1 is also true.
         if(append_negative){
             number = "-" + number;
         }
 
         return number;
     }
-    catch (Exception e) // TODO:30 learn proper exception handling lol
+    catch (char* msg)
     {
-
+        cerr << msg << "\n";
     }
     return "";
+}
+
+bool Lower_Precedence(char root_operation, char new_operation){
+    // TODO: implement this function AFTER the dictionary is made.
+    return true;
+}
+
+// Add_To_MostRight(char operation, Tree* tree) will add operation
+void Add_To_MostRight(char operation, Tree* tree) {
+    Node* curr_node = tree->root;
+    while(1){
+        if(curr_node->right == nullptr){
+            Node* temp = new Node();
+            temp->root_val = operation;
+            temp->left = nullptr;
+            temp->right = nullptr;
+
+            tree->root = temp;
+            break;
+        }
+        curr_node = curr_node->right;
+    }
+}
+
+void Add_Operator_To_Tree(char operation, Tree* tree){
+    // TODO: check whether the pointers work out
+    if(Lower_Precedence(tree->root, operation)){
+        Node* temp = new Node();
+        temp->root_val = operation;
+        temp->left = tree->root;
+        temp->right = nullptr;
+
+        tree->root = temp;
+        delete temp;
+    } else
+    {
+        Add_To_MostRight(operation, tree);
+    }
+
+}
+
+void Parser_Expression(string expression, int length){
+    queue<string>* queue = Create_Queue(); // initialize the queue
+    Tree* tree = Create_Tree(); // intialize the tree
+
+    char curr_char;
+
+    for (int count = 0; count < length; ++count)
+    {
+        curr_char = expression[count];
+
+        if(IsUnary(expression, count)){
+            HandleUnary(expression, &count, length);
+        }
+
+        if(IsNumber(curr_char)){
+            // TODO: Add number to the queue
+            GetNumber(expression, &count, length);
+        }
+
+        if(IsOperator(curr_char)){
+            // TODO: Add operator to the tree
+
+        }
+    }
+}
+
+
+void Delete_Queue(queue<string>* queue){
+    // TODO: check if there is a easy way to delete the queue.
+}
+
+
+void Delete_Node(Node* node){
+    while (node != nullptr)
+    {
+        Delete_Node(node->right);
+        Delete_Node(node->left);
+        delete node;
+    }
+}
+
+
+void Delete_Tree(Tree* tree){
+    Delete_Node(tree->root);
+    delete tree;
 }

@@ -1,11 +1,21 @@
 #include <string>
+#include <queue>
 using namespace std;
+
+struct Node{
+    string root_val;
+    Node* right;
+    Node* left;
+};
 
 struct Tree
 {
-    string root_val;
-    Tree* right;
-    Tree* left;
+    Node* root;
 };
 
-// TODO:10 Search the stl queue function... might be cool to use that.
+
+bool IsNumber(char symbol);
+bool IsUnary (string expression, int count);
+string GetNumber(string expression, int count, int length);
+bool IsOperator(char symbol);
+string HandleUnary(string expression, int count, int length);
