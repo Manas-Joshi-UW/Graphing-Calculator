@@ -6,12 +6,13 @@
 using namespace std;
 
 
-
+// CreateQueue() will create the queue in which the numbers will be stored.
 queue<string>* CreateQueue(){
     queue<string>* numbers_queue;
     return numbers_queue;
 }
 
+// Create_Tree() will create the tree in which the operations are stored.
 Tree* Create_Tree(){
     Tree* tree = new Tree();
     return tree;
@@ -28,7 +29,6 @@ bool IsNumber(char symbol){
 
 // IsUnary checks whether the character at position count in expression is a
 // unary operator.
-
 bool IsUnary (string expression, int count){
     if((expression[count] == PLUS || expression == MINUS) && IsNumber(expression[count+1])){
         return true;
@@ -51,7 +51,7 @@ string GetNumber(string expression, int count, int length){
     return number;
 }
 
-
+// IsOperator(char symbol) will check if symbol is an operator.
 bool IsOperator(char symbol){
     if(symbol == PLUS ||
        symbol == MINUS ||
@@ -102,12 +102,8 @@ string HandleUnary(string expression, int* count, int length){
     return "";
 }
 
-bool Lower_Precedence(char root_operation, char new_operation){
-    // TODO: implement this function AFTER the dictionary is made.
-    return true;
-}
-
-// Add_To_MostRight(char operation, Tree* tree) will add operation
+// Add_To_MostRight(char operation, Tree* tree) will add operation to the most
+// right branch in tree.
 void Add_To_MostRight(char operation, Tree* tree) {
     Node* curr_node = tree->root;
     while(1){
@@ -124,24 +120,27 @@ void Add_To_MostRight(char operation, Tree* tree) {
     }
 }
 
+// Add_Operator_To_Tree(char operation, Tree* tree) adds operation to
+// tree appropriately.
 void Add_Operator_To_Tree(char operation, Tree* tree){
-    // TODO: check whether the pointers work out
-    if(Lower_Precedence(tree->root, operation)){
+    if(precedences[tree->root] > precedences[operation]){
         Node* temp = new Node();
         temp->root_val = operation;
         temp->left = tree->root;
         temp->right = nullptr;
 
         tree->root = temp;
+
         delete temp;
     } else
     {
         Add_To_MostRight(operation, tree);
     }
-
 }
 
-void Parser_Expression(string expression, int length){
+// Parse_Expression(string expression, int length) will parse expression,
+// which has a length of length.
+void Parse_Expression(string expression, int length){
     queue<string>* queue = Create_Queue(); // initialize the queue
     Tree* tree = Create_Tree(); // intialize the tree
 
@@ -151,28 +150,46 @@ void Parser_Expression(string expression, int length){
     {
         curr_char = expression[count];
 
+        if(curr_char == O_BRACKET){
+            string expression_in_brackets = "";
+            for (int i = count + 1; i < length; ++i)
+            {
+                if(expression[i] == C_BRACKET){
+                    count = ++i;
+                    break;
+                }
+                expression_in_brackets += expression[i];
+            }
+            Parse_Expression(expression_in_brackets, expression_in_brackets.length());
+        }
+
         if(IsUnary(expression, count)){
             HandleUnary(expression, &count, length);
         }
 
         if(IsNumber(curr_char)){
-            // TODO: Add number to the queue
+            // TODO:20 Add number to the queue
             GetNumber(expression, &count, length);
         }
 
         if(IsOperator(curr_char)){
-            // TODO: Add operator to the tree
-
+            Add_Operator_To_Tree(curr_char, tree)
         }
+
+        // TODO: Once at the end of the loop... call a function that will actually calculate the expression.
+        // Then delete the tree and the queue.
+
+
+
     }
 }
 
 
 void Delete_Queue(queue<string>* queue){
-    // TODO: check if there is a easy way to delete the queue.
+    // TODO:40 check if there is a easy way to delete the queue.
 }
 
-
+// Delete_Node(Node* node) will delete node and it's branches.
 void Delete_Node(Node* node){
     while (node != nullptr)
     {
@@ -182,7 +199,7 @@ void Delete_Node(Node* node){
     }
 }
 
-
+// Delete_Tree(Tree* tree) will delete the tree and it's nodes.
 void Delete_Tree(Tree* tree){
     Delete_Node(tree->root);
     delete tree;
