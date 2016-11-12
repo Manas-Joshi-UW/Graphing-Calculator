@@ -3,6 +3,7 @@
 #include <queue>
 #include "parser.h"
 #include "constants.h"
+#include <map>
 using namespace std;
 
 
@@ -123,7 +124,7 @@ void Add_To_MostRight(char operation, Tree* tree) {
 // Add_Operator_To_Tree(char operation, Tree* tree) adds operation to
 // tree appropriately.
 void Add_Operator_To_Tree(char operation, Tree* tree){
-    if(precedences[tree->root] > precedences[operation]){
+    if(*(precedences[tree->root]) > *(precedences[operation])){
         Node* temp = new Node();
         temp->root_val = operation;
         temp->left = tree->root;
@@ -143,6 +144,13 @@ void Add_Operator_To_Tree(char operation, Tree* tree){
 void Parse_Expression(string expression, int length){
     queue<string>* queue = Create_Queue(); // initialize the queue
     Tree* tree = Create_Tree(); // intialize the tree
+
+    map* <char,int> precedences = new map<char,int>;
+    *(precedences[PLUS]) = 5;
+    *(precedences[MINUS]) = 5;
+    *(precedences[MULTIPLY]) = 3;
+    *(precedences[DIVIDE]) = 3;
+    *(precedences[EXPONENT]) = 2;
 
     char curr_char;
 
