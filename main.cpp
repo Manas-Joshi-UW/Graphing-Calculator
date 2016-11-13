@@ -6,10 +6,8 @@ using namespace std;
 int main()
 {
     string expression;
-    cout << "Please enter a mathematical expression" << "\n";
+    cout << "Hello word"<<endl;
     cin >> expression;
-
     Parse_Expression(expression, expression.length());
-    
     return 0;
 }

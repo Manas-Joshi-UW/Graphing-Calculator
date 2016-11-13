@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string>
 #include <queue>
 #include "parser.h"
@@ -8,8 +7,8 @@ using namespace std;
 
 
 // CreateQueue() will create the queue in which the numbers will be stored.
-queue<string>* CreateQueue(){
-    queue<string>* numbers_queue;
+queue<string> CreateQueue(){
+    queue<string> numbers_queue;
     return numbers_queue;
 }
 
@@ -31,7 +30,7 @@ bool IsNumber(char symbol){
 // IsUnary checks whether the character at position count in expression is a
 // unary operator.
 bool IsUnary (string expression, int count){
-    if((expression[count] == PLUS || expression == MINUS) && IsNumber(expression[count+1])){
+    if((expression[count] == PLUS || expression[count] == MINUS) && IsNumber(expression[count+1])){
         return true;
     }
     return false;
@@ -40,14 +39,15 @@ bool IsUnary (string expression, int count){
 
 // GetNumber will get the number in expression which starts at position count.
 // length is the length of expression.
-string GetNumber(string expression, int count, int length){
+string GetNumber(string expression, int* count, int length){
     string number;
-    for (int i = count; i < length; ++i)
+    for (int i = *count; i < length; ++i)
     {
         if(!IsNumber(expression[i])){
+            *count = i;
             break;
         }
-        number += expression[count];
+        number += expression[*count];
     }
     return number;
 }
@@ -77,16 +77,16 @@ string HandleUnary(string expression, int* count, int length){
                 append_negative++;
             }
             else if(IsNumber(expression[i])){
-                number = GetNumber(expression, i, length);
+                number = GetNumber(expression, &i, length);
                 *count = i;
                 break;
             }
             else if (expression[i] != PLUS || (expression[i] != DECIMAL && IsNumber(expression[i+1]))){
             // if we don't detect a + and a .NUMBER then there is an error in input
-                throw "expression was not written correctly,
-                       error was caught in position:" + i +
-                      "\n" + expression[i-1] + expression[i]
-                      + expression[i+1];
+                throw "expression was not written correctly,"
+                       "error was caught in position:" + to_string(i) +
+                      "\n" + to_string(expression[i-1]) + to_string(expression[i])
+                      + to_string(expression[i+1]);
             }
         }
 
@@ -100,7 +100,6 @@ string HandleUnary(string expression, int* count, int length){
     {
         cerr << msg << "\n";
     }
-    return "";
 }
 
 // Add_To_MostRight(char operation, Tree* tree) will add operation to the most
@@ -124,7 +123,14 @@ void Add_To_MostRight(char operation, Tree* tree) {
 // Add_Operator_To_Tree(char operation, Tree* tree) adds operation to
 // tree appropriately.
 void Add_Operator_To_Tree(char operation, Tree* tree){
-    if(*(precedences[tree->root]) > *(precedences[operation])){
+    map<char,int> precedences;
+    precedences[PLUS] = 5;
+    precedences[MINUS] = 5;
+    precedences[MULTIPLY] = 3;
+    precedences[DIVIDE] = 3;
+    precedences[EXPONENT] = 2;
+    char root_val = tree->root->root_val[0];
+    if(precedences[root_val] > precedences[operation]){
         Node* temp = new Node();
         temp->root_val = operation;
         temp->left = tree->root;
@@ -142,15 +148,10 @@ void Add_Operator_To_Tree(char operation, Tree* tree){
 // Parse_Expression(string expression, int length) will parse expression,
 // which has a length of length.
 void Parse_Expression(string expression, int length){
-    queue<string>* queue = Create_Queue(); // initialize the queue
+    queue<string> queue = CreateQueue(); // initialize the queue
     Tree* tree = Create_Tree(); // intialize the tree
 
-    map* <char,int> precedences = new map<char,int>;
-    *(precedences[PLUS]) = 5;
-    *(precedences[MINUS]) = 5;
-    *(precedences[MULTIPLY]) = 3;
-    *(precedences[DIVIDE]) = 3;
-    *(precedences[EXPONENT]) = 2;
+
 
     char curr_char;
 
@@ -176,25 +177,20 @@ void Parse_Expression(string expression, int length){
         }
 
         if(IsNumber(curr_char)){
-            // TODO:20 Add number to the queue
-            GetNumber(expression, &count, length);
+            // #TODO:20 Add number to the queue
+            queue.push(GetNumber(expression, &count, length));
         }
 
         if(IsOperator(curr_char)){
-            Add_Operator_To_Tree(curr_char, tree)
+            Add_Operator_To_Tree(curr_char, tree);
         }
 
-        // TODO: Once at the end of the loop... call a function that will actually calculate the expression.
+        // #TODO:0 Once at the end of the loop... call a function that will actually calculate the expression.
         // Then delete the tree and the queue.
 
 
 
     }
-}
-
-
-void Delete_Queue(queue<string>* queue){
-    // TODO:40 check if there is a easy way to delete the queue.
 }
 
 // Delete_Node(Node* node) will delete node and it's branches.

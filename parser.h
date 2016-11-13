@@ -19,10 +19,10 @@ struct Tree
 
 bool IsNumber(char symbol);
 bool IsUnary (string expression, int count);
-string GetNumber(string expression, int count, int length);
+string GetNumber(string expression, int* count, int length);
 bool IsOperator(char symbol);
 string HandleUnary(string expression, int count, int length);
-queue<string>* CreateQueue();
+queue<string> CreateQueue();
 Tree* Create_Tree();
 void Add_To_MostRight(char operation, Tree* tree);
 void Add_Operator_To_Tree(char operation, Tree* tree);
