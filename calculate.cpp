@@ -1,43 +1,51 @@
 #include <string>
 #include <queue>
-#include "parser.h"
+#include <iostream>
 #include "calculate.h"
 #include "constants.h"
 #include <cmath>
 #include <map>
 
-int Calculate(string operation, queue<string> *numbers){
-    switch (operation)
+float Proper_Fucking_Pop(queue<float> *numbers){
+    float number;
+    number = (*numbers).front();
+    (*numbers).pop();
+    return number;
+}
+
+float Calculate(string operation, queue<float> *numbers){
+    switch (operation[0])
     {
-    case "+":
-        return (*numbers).pop() + (*numbers).pop();
+    case PLUS:
+        return Proper_Fucking_Pop(numbers) + Proper_Fucking_Pop(numbers);
         break;
-    case "-":
-        return (*numbers).pop() - (*numbers).pop();
+    case MINUS:
+        return Proper_Fucking_Pop(numbers) - Proper_Fucking_Pop(numbers);
         break;
-    case "/":
-        return (*numbers).pop() / (*numbers).pop();
+    case DIVIDE:
+        return Proper_Fucking_Pop(numbers) / Proper_Fucking_Pop(numbers);
         break;
-    case "*":
-        return (*numbers).pop() * (*numbers).pop();
+    case MULTIPLY:
+        return Proper_Fucking_Pop(numbers) * Proper_Fucking_Pop(numbers);
         break;
-    case "^":
-        return pow((*numbers).pop(),(*numbers).pop())
+    case EXPONENT:
+        return pow(Proper_Fucking_Pop(numbers),Proper_Fucking_Pop(numbers));
         break;
 
     default:
         cout << "An error occurred." << endl;
+        return 0;
         break;
     }
 }
 
-int Calculate_Expression(Node* root, queue<string> *numbers){
+float Calculate_Expression(Node* root, queue<float> *numbers){
     try
     {
         if(root == nullptr && (*numbers).size() == 0){
             return 0;
         }else if(root == nullptr && (*numbers).size() == 1){
-            return (*numbers).pop();
+            return Proper_Fucking_Pop(numbers);
         }
 
         if(root->right == nullptr && root->left == nullptr){
@@ -45,23 +53,25 @@ int Calculate_Expression(Node* root, queue<string> *numbers){
         }
 
         if(root->right == nullptr){
-            numbers.push(Calculate_Expression(root->left, numbers));
+            (*numbers).push(Calculate_Expression(root->left, numbers));
             return Calculate(root->root_val, numbers);
         }
 
         if(root->left == nullptr){
-            umbers.push(Calculate_Expression(root->right, numbers));
+            (*numbers).push(Calculate_Expression(root->right, numbers));
             return Calculate(root->root_val, numbers);
         }
 
         if(root->left != nullptr && root->right != nullptr){
-            numbers.push(Calculate_Expression(root->left, numbers));
-            numbers.push(Calculate_Expression(root->left, numbers));
-            Calculate(root->root_val, queue<string> *numbers)
+            (*numbers).push(Calculate_Expression(root->left, numbers));
+            (*numbers).push(Calculate_Expression(root->left, numbers));
         }
+        return Calculate(root->root_val, numbers);
     }
     catch (char* msg)
     {
         cerr << msg << "\n";
+        return 0;
     }
+
 }

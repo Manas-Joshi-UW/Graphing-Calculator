@@ -8,4 +8,3 @@ const char EXPONENT = '^';
 const char DECIMAL = '.';
 const char O_BRACKET = '(';
 const char C_BRACKET = ')';
-
