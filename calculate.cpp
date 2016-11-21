@@ -1,19 +1,42 @@
 #include <string>
-#include <queue>
+#include <deque>
 #include <iostream>
 #include "calculate.h"
 #include "constants.h"
 #include <cmath>
 #include <map>
 
-float Proper_Fucking_Pop(queue<float> *numbers){
+float Proper_Fucking_Pop(deque<float> *numbers){
     float number;
     number = (*numbers).front();
-    (*numbers).pop();
+    (*numbers).pop_front();
     return number;
 }
 
-float Calculate(string operation, queue<float> *numbers){
+float Proper_Fucking_BackPop(deque<float> *numbers){
+    float number;
+    number = (*numbers).back();
+    (*numbers).pop_back();
+    return number;
+}
+
+void ReformDeque(Node* root, deque<float> *numbers){
+    if(root == nullptr){
+        return;
+    }
+    
+    if(root->right == nullptr && root->left == nullptr){
+        (*numbers).push_front(Proper_Fucking_BackPop(numbers));
+        (*numbers).push_front(Proper_Fucking_BackPop(numbers));
+    }
+    else{
+    ReformDeque(root->left, numbers);
+    ReformDeque(root->right, numbers);
+    }
+    
+}
+
+float Calculate(string operation, deque<float> *numbers){
     switch (operation[0])
     {
     case PLUS:
@@ -39,7 +62,7 @@ float Calculate(string operation, queue<float> *numbers){
     }
 }
 
-float Calculate_Expression(Node* root, queue<float> *numbers){
+float Calculate_Expression(Node* root, deque<float> *numbers){
     try
     {
         if(root == nullptr && (*numbers).size() == 0){
@@ -53,18 +76,19 @@ float Calculate_Expression(Node* root, queue<float> *numbers){
         }
 
         if(root->right == nullptr){
-            (*numbers).push(Calculate_Expression(root->left, numbers));
+            (*numbers).push_front(Calculate_Expression(root->left, numbers));
             return Calculate(root->root_val, numbers);
         }
 
         if(root->left == nullptr){
-            (*numbers).push(Calculate_Expression(root->right, numbers));
+            ReformDeque(root->right,numbers);
+            (*numbers).push_back(Calculate_Expression(root->right, numbers));
             return Calculate(root->root_val, numbers);
         }
 
         if(root->left != nullptr && root->right != nullptr){
-            (*numbers).push(Calculate_Expression(root->left, numbers));
-            (*numbers).push(Calculate_Expression(root->left, numbers));
+            (*numbers).push_front(Calculate_Expression(root->left, numbers));
+            (*numbers).push_back(Calculate_Expression(root->left, numbers));
         }
         return Calculate(root->root_val, numbers);
     }

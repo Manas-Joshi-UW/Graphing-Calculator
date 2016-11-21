@@ -1,5 +1,5 @@
 #include <string>
-#include <queue>
+#include <deque>
 #include <iostream>
 #include "parser.h"
 #include "constants.h"
@@ -7,10 +7,10 @@
 using namespace std;
 
 
-// CreateQueue() will create the queue in which the numbers will be stored.
-queue<float> CreateQueue(){
-    queue<float> numbers_queue;
-    return numbers_queue;
+// Createdeque() will create the deque in which the numbers will be stored.
+deque<float> Createdeque(){
+    deque<float> numbers_deque;
+    return numbers_deque;
 }
 
 // Create_Tree() will create the tree in which the operations are stored.
@@ -32,8 +32,28 @@ bool IsNumber(char symbol){
 // IsUnary checks whether the character at position count in expression is a
 // unary operator.
 bool IsUnary (string expression, int count){
-    if((expression[count] == PLUS || expression[count] == MINUS) && !IsNumber(expression[count-1])){
+    try{
+    if(count == 0 && (expression[count] == PLUS || expression[count] == MINUS)){
         return true;
+    }else if(count == 0){
+        return false;
+    }
+    if((IsNumber(expression[count-1]) || expression[count-1] == C_BRACKET)
+       && IsOperator(expression[count])
+       && (expression[count+1] == PLUS || expression[count+1] == MINUS)){
+        return false;
+    }
+    if(IsOperator(expression[count-1]) && (expression[count] == PLUS || expression[count] == MINUS)){
+        return true;
+    }
+        
+    
+    }
+    catch(string msg){
+        
+    }
+    catch(...){
+        cout << "An error occurred, please ensure you've written the expression correctly"<<endl;
     }
     return false;
 }
@@ -80,7 +100,7 @@ float HandleUnary(string expression, int* count, int length){
             }
             else if(IsNumber(expression[i])){
                 number = GetNumber(expression, &i, length);
-                *count = i-1;
+                *count = i;
                 break;
             }
             else if (expression[i] != PLUS || (expression[i] != DECIMAL && IsNumber(expression[i+1]))){
@@ -92,7 +112,7 @@ float HandleUnary(string expression, int* count, int length){
             }
         }
 
-        if(append_negative){
+        if(append_negative % 2 == 1){
             number = -1 * number;
         }
 
@@ -116,7 +136,7 @@ void Add_To_MostRight(char operation, Tree* tree) {
             temp->left = nullptr;
             temp->right = nullptr;
 
-            tree->root->right = temp;
+            curr_node->right = temp;
             break;
         }
         curr_node = curr_node->right;
@@ -145,7 +165,7 @@ void Add_Operator_To_Tree(char operation, Tree* tree){
         return;
     }
     char root_val = tree->root->root_val[0];
-    if(precedences[root_val] < precedences[operation]){
+    if(precedences[root_val] <= precedences[operation]){
         Node* temp = new Node();
         temp->root_val = operation;
         temp->left = tree->root;
@@ -161,7 +181,7 @@ void Add_Operator_To_Tree(char operation, Tree* tree){
 // Parse_Expression(string expression, int length) will parse expression,
 // which has a length of length.
 float Parse_Expression(string expression, int length){
-    queue<float> queue = CreateQueue(); // initialize the queue
+    deque<float> deque = Createdeque(); // initialize the deque
     Tree* tree = Create_Tree(); // intialize the tree
 
 
@@ -182,23 +202,24 @@ float Parse_Expression(string expression, int length){
                 }
                 expression_in_brackets += expression[i];
             }
-           queue.push(Parse_Expression(expression_in_brackets, expression_in_brackets.length()));
+           deque.push_back(Parse_Expression(expression_in_brackets, expression_in_brackets.length()));
         }
 
         if(IsUnary(expression, count)){
-            HandleUnary(expression, &count, length);
+            deque.push_back(HandleUnary(expression, &count, length));
+            continue;
         }
 
         if(IsNumber(curr_char)){
-            // #TODO:20 Add number to the queue
-            queue.push(GetNumber(expression, &count, length));
+            // #TODO:20 Add number to the deque
+            deque.push_back(GetNumber(expression, &count, length));
         }
 
         if(IsOperator(curr_char)){
             Add_Operator_To_Tree(curr_char, tree);
         }
     }
-    return Calculate_Expression(tree->root, &queue);
+    return Calculate_Expression(tree->root, &deque);
 }
 
 // Delete_Node(Node* node) will delete node and it's branches.

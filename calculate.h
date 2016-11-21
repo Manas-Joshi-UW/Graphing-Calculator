@@ -1,4 +1,4 @@
-#include <queue>
+#include <deque>
 #include <string>
 
 using namespace std;
@@ -15,5 +15,5 @@ struct Tree
 
 
 
-float Calculate(string operation, queue<float> *numbers);
-float Calculate_Expression(Node* root, queue<float> *numbers);
+float Calculate(string operation, deque<float> *numbers);
+float Calculate_Expression(Node* root, deque<float> *numbers);
