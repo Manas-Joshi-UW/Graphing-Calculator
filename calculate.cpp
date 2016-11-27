@@ -24,45 +24,63 @@ void ReformDeque(Node* root, deque<float> *numbers){
     if(root == nullptr){
         return;
     }
-    
+
     if(root->right == nullptr && root->left == nullptr){
         (*numbers).push_front(Proper_Fucking_BackPop(numbers));
         (*numbers).push_front(Proper_Fucking_BackPop(numbers));
     }
     else{
-    ReformDeque(root->left, numbers);
-    ReformDeque(root->right, numbers);
+        (*numbers).push_front(Proper_Fucking_BackPop(numbers));
+        ReformDeque(root->left, numbers);
+        ReformDeque(root->right, numbers);
     }
-    
+
 }
 
 float Calculate(string operation, deque<float> *numbers){
-    switch (operation[0])
+    try
     {
-    case PLUS:
-        return Proper_Fucking_Pop(numbers) + Proper_Fucking_Pop(numbers);
-        break;
-    case MINUS:
-        return Proper_Fucking_Pop(numbers) - Proper_Fucking_Pop(numbers);
-        break;
-    case DIVIDE:
-        return Proper_Fucking_Pop(numbers) / Proper_Fucking_Pop(numbers);
-        break;
-    case MULTIPLY:
-        return Proper_Fucking_Pop(numbers) * Proper_Fucking_Pop(numbers);
-        break;
-    case EXPONENT:
-        return pow(Proper_Fucking_Pop(numbers),Proper_Fucking_Pop(numbers));
-        break;
+        switch (operation[0])
+        {
+            case PLUS:
+                return Proper_Fucking_Pop(numbers) + Proper_Fucking_Pop(numbers);
+                break;
+            case MINUS:
+                return Proper_Fucking_Pop(numbers) - Proper_Fucking_Pop(numbers);
+                break;
+            case DIVIDE:{
+                float a = Proper_Fucking_Pop(numbers);
+                float b = Proper_Fucking_Pop(numbers);
+                if(b == 0){
+                    throw "Division by 0 error!";
+                }
+                return a / b;
+                break;
+            }
+            case MULTIPLY:
+                return Proper_Fucking_Pop(numbers) * Proper_Fucking_Pop(numbers);
+                break;
+            case EXPONENT:
+                return pow(Proper_Fucking_Pop(numbers),Proper_Fucking_Pop(numbers));
+                break;
 
-    default:
-        cout << "An error occurred." << endl;
-        return 0;
-        break;
+            default:
+                cout << "An error occurred." << endl;
+                return 0;
+                break;
+        }
     }
+    catch(string message){
+        cerr << message << endl;
+    }
+    catch(...){
+        cerr << "Unknown error" << endl;
+    }
+    return 0;
 }
 
 float Calculate_Expression(Node* root, deque<float> *numbers){
+    int count = 0;
     try
     {
         if(root == nullptr && (*numbers).size() == 0){
@@ -81,14 +99,19 @@ float Calculate_Expression(Node* root, deque<float> *numbers){
         }
 
         if(root->left == nullptr){
-            ReformDeque(root->right,numbers);
-            (*numbers).push_back(Calculate_Expression(root->right, numbers));
+            float a = Proper_Fucking_Pop(numbers);
+            (*numbers).push_front(Calculate_Expression(root->right, numbers));
+            (*numbers).push_front(a);
             return Calculate(root->root_val, numbers);
+
+
         }
 
         if(root->left != nullptr && root->right != nullptr){
             (*numbers).push_front(Calculate_Expression(root->left, numbers));
-            (*numbers).push_back(Calculate_Expression(root->left, numbers));
+            Delete_Node(root->left);
+            return Calculate_Expression(root, numbers);
+
         }
         return Calculate(root->root_val, numbers);
     }
@@ -98,4 +121,15 @@ float Calculate_Expression(Node* root, deque<float> *numbers){
         return 0;
     }
 
+}
+
+
+// Delete_Node(Node* node) will delete node and it's branches.
+void Delete_Node(Node* node){
+    while (node != nullptr)
+    {
+        Delete_Node(node->right);
+        Delete_Node(node->left);
+        delete node;
+    }
 }

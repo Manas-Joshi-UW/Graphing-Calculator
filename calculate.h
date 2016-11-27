@@ -17,3 +17,4 @@ struct Tree
 
 float Calculate(string operation, deque<float> *numbers);
 float Calculate_Expression(Node* root, deque<float> *numbers);
+void Delete_Node(Node* node);

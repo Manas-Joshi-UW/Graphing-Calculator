@@ -17,4 +17,4 @@ void Add_To_MostRight(char operation, Tree* tree);
 void Add_Operator_To_Tree(char operation, Tree* tree);
 float Parse_Expression(string expression, int length);
 void Delete_deque(deque<float>* deque);
-void Delete_Node(Node* node);
+

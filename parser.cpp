@@ -202,6 +202,7 @@ float Parse_Expression(string expression, int length){
                 }
                 expression_in_brackets += expression[i];
             }
+            
            deque.push_back(Parse_Expression(expression_in_brackets, expression_in_brackets.length()));
         }
 
@@ -222,15 +223,6 @@ float Parse_Expression(string expression, int length){
     return Calculate_Expression(tree->root, &deque);
 }
 
-// Delete_Node(Node* node) will delete node and it's branches.
-void Delete_Node(Node* node){
-    while (node != nullptr)
-    {
-        Delete_Node(node->right);
-        Delete_Node(node->left);
-        delete node;
-    }
-}
 
 // Delete_Tree(Tree* tree) will delete the tree and it's nodes.
 void Delete_Tree(Tree* tree){
