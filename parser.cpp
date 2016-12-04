@@ -193,10 +193,17 @@ float Parse_Expression(string expression, int length){
         curr_char = expression[count];
 
         if(curr_char == O_BRACKET){
+            int num_of_OBrackets = 1;
             string expression_in_brackets = "";
             for (int i = count + 1; i < length; ++i)
             {
+                if(expression[i] == O_BRACKET){
+                    num_of_OBrackets++;
+                }
                 if(expression[i] == C_BRACKET){
+                    num_of_OBrackets--;
+                }
+                if(expression[i] == C_BRACKET && num_of_OBrackets == 0){
                     count = ++i - 1;
                     break;
                 }
